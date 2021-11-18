@@ -1,10 +1,13 @@
 from chalice import Chalice
+from chalicelib import db_connect
 
 app = Chalice(app_name='makeyourpage-api')
 
 
 @app.route('/')
 def index():
+    db = db_connect.connection()
+    print(db['dev'].find_one())
     return {'hello': 'world'}
 
 
