@@ -1,12 +1,14 @@
+from os import getcwd
 import boto3
 import json
+import os
 
 AWS_ACCESS_KEY = ""
 AWS_SECRET_ACCESS_KEY = "",
 REGION_NAME = "",
 
 def export_html(html_str, client_name, template_id) : 
-  with open('environment.json', 'r') as file : 
+  with open(os.path.dirname(os.path.realpath(__file__))+'/environment.json', 'r') as file : 
     json_file = file.read()
     json_file = json.loads(json_file)
     AWS_ACCESS_KEY = json_file['ACCESS_CODE']

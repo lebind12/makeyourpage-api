@@ -3,7 +3,11 @@ import os
 from pymongo.mongo_client import MongoClient
 
 def connection() :
-    json_file = open(os.getcwd()+ '/chalicelib/environment.json', 'r')
+
+    # local connection
+    json_file = open(os.path.dirname(os.path.realpath(__file__))+'/environment.json', 'r')
+    # deploy connection
+    # json_file = open(os.getcwd()+ '/chalicelib/environment.json', 'r')
     json_data = json.load(json_file)
     # local connection
     DB_URI = json_data['DB_URI']

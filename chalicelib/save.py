@@ -1,4 +1,4 @@
-import db_connect
+from . import db_connect
 
 def save_template(json_body):
     db = db_connect.connection()
