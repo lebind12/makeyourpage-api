@@ -57,6 +57,19 @@ def verification():
     json_body = request_data.json_body
     return cognito.verificode(json_body)
 
+@app.route('/subscription/signin', methods=['POST'], cors=True)
+def signin() : 
+    request_data = app.current_request
+    json_body = request_data.json_body
+    return{"access_token":cognito.sign_in(json_body)}
+
+@app.route('/subscription/checktoken', methods=["POST"], cors=True)
+def checktoken():
+    request_data = app.current_request
+    json_body = request_data.json_body
+    token = json_body['token']
+    return cognito.check_token(token)
+
 
 #######################################################################
 # contact 메일 보내는 함수
@@ -73,7 +86,7 @@ def post_mail():
         raise NotFoundError()
 
     try:
-        with open(os.path.dirname(os.path.realpath(__file__))+'/chalicelib/environment.json', 'r', encoding="UTF-8") as in_file:
+        with open(os.path.dirname(os.path.realpath(__file__))+'/chalicelib/environment.json', 'r') as in_file:
             config = json.load(in_file)
             data['host_address'] = config['HOST_ADDRESS']
             data['host_password'] = config['HOST_PASSWORD']

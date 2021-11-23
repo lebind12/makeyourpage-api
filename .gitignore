@@ -1,3 +1,5 @@
 .chalice/deployments/
 .chalice/venv/
 chalicelib/environment.json
+.chalicelib/__pycache__/
+.__pycache__/
