@@ -2,49 +2,43 @@ from chalice import Chalice
 from chalice.app import NotFoundError, Response
 from chalicelib import db_connect, export, CRUD, cognito
 from chalicelib import send_message
-import json
+import json, os
 
 app = Chalice(app_name='makeyourpage-api')
 
 
 # 템플릿 CRUD
 #######################################################################
-# Temaplate Export
-@app.route('/template/export', methods=["POST"], cors=True)
-def template_export():
-    request_data = app.current_request
-    clientName = request_data.json_body['client']
-    html_str = request_data.json_body['htmlFile']
-    template_id = request_data.json_body['template_id']
+# Template Save, get, list, export
+@app.route('/template/{template_id}', methods=["PUT", "GET", "POST"], cors=True)
+def save_update(template_id):
+    method = app.current_request.method
+    json_body = app.current_request.json_body
+    if method == 'PUT' : 
+        # 이미 존재하는 템플릿인 경우 update
+        if db_connect.connection().find_one({"template_id" : json_body['template_id']}) :
+            CRUD.update_template(template_id, json_body)
+            return {'status': 'success'}
+        # 없는 템플릿인 경우 save
+        else :
+            CRUD.save_template(json_body)
+            return {'status': 'success'}
 
-    export.export_html(html_str, clientName, template_id)
-    return {'template_id': template_id}
-
-# Template Save
-@app.route('/template/save', methods=["PUT"], cors=True)
-def template_save():
-    request_data = app.current_request
-    json_body = request_data.json_body
-    CRUD.save_template(json_body)
-    return {'status': 'success'}
+    elif method == 'GET' : 
+        return CRUD.get_template(template_id)
+    
+    elif method == 'POST' : 
+        request_data = app.current_request
+        clientName = request_data.json_body['client']
+        html_str = request_data.json_body['htmlFile']
+        export.export_html(html_str, clientName, template_id)
+        return {'template_id': template_id}
 
 # Template list
 @app.route('/template/list/{user_id}', methods=["GET"], cors=True)
 def template_list(user_id):
     return CRUD.template_list(user_id)
 
-# Template get data
-@app.route('/template/get/{template_id}', methods=['GET'], cors=True)
-def template_get(template_id):
-    return CRUD.get_template(template_id)
-
-# Template Update
-@app.route('/template/update/{template_id}', methods=['PUT'], cors=True)
-def template_update(template_id):
-    request_data = app.current_request
-    json_body = request_data.json_body
-    CRUD.update_template(template_id, json_body)
-    return {'status': 'success'}
 #######################################################################
 
 # 회원가입
@@ -79,12 +73,12 @@ def post_mail():
         raise NotFoundError()
 
     try:
-        with open('config.json', 'r', encoding="UTF-8") as in_file:
+        with open(os.path.dirname(os.path.realpath(__file__))+'/chalicelib/environment.json', 'r', encoding="UTF-8") as in_file:
             config = json.load(in_file)
             data['host_address'] = config['HOST_ADDRESS']
             data['host_password'] = config['HOST_PASSWORD']
     except KeyError:
         raise FileNotFoundError()
 
-    send_message.sendMail(data)
+    send_message.send_mail(data)
     return Response(status_code=200, body={"message": "success"})
