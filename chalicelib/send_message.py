@@ -7,7 +7,7 @@ def send_mail(data):
     smtp.login(data['host_address'], data['host_password'])
     msg = MIMEText(data['content'])
     msg['Subject'] = data['subject']
-    msg['To'] = data['address']
-    msg['From'] = data['host_address']
+    msg['To'] = data['host_address']
+    msg['From'] = data['address']
     smtp.send_message(msg)
     smtp.quit()
