@@ -59,7 +59,6 @@ def sign_in(json_body):
 
 
 def check_token(token):
-    # print(token)
     cognito, aws_data = get_cognito_client()
 
     try : 

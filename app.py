@@ -63,11 +63,10 @@ def signin() :
     json_body = request_data.json_body
     return{"access_token":cognito.sign_in(json_body)}
 
-@app.route('/subscription/checktoken', methods=["POST"], cors=True)
+@app.route('/subscription/checktoken', methods=["GET"], cors=True)
 def checktoken():
     request_data = app.current_request
-    json_body = request_data.json_body
-    token = json_body['token']
+    token = request_data.headers['Authorization']
     return cognito.check_token(token)
 
 
